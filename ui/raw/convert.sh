@@ -1,0 +1,1 @@
+pyuic6 -x KeyLogger.ui -o ui_keylogger.py
