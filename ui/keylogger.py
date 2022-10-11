@@ -19,9 +19,14 @@
 # import os
 
 from PyQt6 import QtWidgets
-from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PyQt6.QtWidgets import QApplication,\
+                            QMainWindow,\
+                            QMessageBox,\
+                            QSystemTrayIcon,\
+                            QStyle,\
+                            QMenu
 # from PyQt6.QtCore import QRegularExpression
-# from PyQt6.QtGui import QRegularExpressionValidator
+from PyQt6.QtGui import QAction
 # from PyQt6.QtCore import QThread, pyqtSignal
 
 from ui.raw.ui_keylogger import Ui_KeyLogger
@@ -57,10 +62,36 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
         self.setupUi(self)
 
         # It's a tracking of button clicks in the window
-        # self.buttScan.clicked.connect(self.buttScan_Clicked)
+        self.toolTray.clicked.connect(self.toolTray_Clicked)
         # self.linePorts.textChanged.connect(self.buttScan_Active)
         # self.toolClear.clicked.connect(self.toolClear_Clicked)
         # self.buttSave.clicked.connect(self.buttSave_Clicked)
         # self.buttOpen.clicked.connect(self.buttOpen_Clicked)
         # self.toolDelete.clicked.connect(self.toolDelete_Clicked)
         # self.toolStop.clicked.connect(self.toolStop_Clicked)
+
+        # инициализировать QSystemTrayIcon
+        self.tray_icon = QSystemTrayIcon(self)
+        # self.tray_icon.setIcon(self.style().standardIcon(QStyle.SP_ComputerIcon))
+        self.tray_icon.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon))
+
+        '''
+              Определите и добавьте шаги для работы со значком в системном трее
+            show - show window
+            hide - hide window
+            exit - exit from application
+        '''
+        show_action = QAction("Show", self)
+        show_action.triggered.connect(self.tray_Show)
+        tray_menu = QMenu()
+        tray_menu.addAction(show_action)
+        self.tray_icon.setContextMenu(tray_menu)
+        # self.tray_icon.show()
+
+    def tray_Show(self):
+        self.tray_icon.hide()
+        self.show()
+
+    def toolTray_Clicked(self):
+        self.tray_icon.show()
+        self.hide()
