@@ -23,6 +23,9 @@ class Ui_KeyLogger(object):
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.groupBox.setFont(font)
         self.groupBox.setObjectName("groupBox")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.groupBox)
         self.verticalLayout.setObjectName("verticalLayout")
@@ -61,6 +64,20 @@ class Ui_KeyLogger(object):
         self.horizontalLayout_3.addWidget(self.checkMouseReleaseCoord)
         self.verticalLayout.addLayout(self.horizontalLayout_3)
         self.horizontalLayout.addWidget(self.groupBox)
+        self.groupBox_2 = QtWidgets.QGroupBox(self.centralwidget)
+        self.groupBox_2.setObjectName("groupBox_2")
+        self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.groupBox_2)
+        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.comboScheme = QtWidgets.QComboBox(self.groupBox_2)
+        self.comboScheme.setMinimumSize(QtCore.QSize(120, 25))
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.comboScheme.setFont(font)
+        self.comboScheme.setObjectName("comboScheme")
+        self.comboScheme.addItem("")
+        self.comboScheme.addItem("")
+        self.verticalLayout_3.addWidget(self.comboScheme)
+        self.horizontalLayout.addWidget(self.groupBox_2)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
         self.toolTray = QtWidgets.QToolButton(self.centralwidget)
@@ -82,6 +99,7 @@ class Ui_KeyLogger(object):
         KeyLogger.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(KeyLogger)
+        self.comboScheme.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(KeyLogger)
 
     def retranslateUi(self, KeyLogger):
@@ -93,6 +111,9 @@ class Ui_KeyLogger(object):
         self.checkMouseClickCoord.setText(_translate("KeyLogger", "Track coordinates"))
         self.checkMouseRelease.setText(_translate("KeyLogger", "Releasing mouse keystrokes"))
         self.checkMouseReleaseCoord.setText(_translate("KeyLogger", "Track coordinates"))
+        self.groupBox_2.setTitle(_translate("KeyLogger", "Color Scheme"))
+        self.comboScheme.setItemText(0, _translate("KeyLogger", "Standard"))
+        self.comboScheme.setItemText(1, _translate("KeyLogger", "Monochrome"))
         self.toolTray.setToolTip(_translate("KeyLogger", "Hide to tray"))
 
 
