@@ -73,6 +73,9 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		self.checkMouseClick.stateChanged.connect(self.checkMouseClick_Changed)
 		self.checkMouseRelease.stateChanged.connect(self.checkMouseRelease_Changed)
 		self.comboScheme.currentIndexChanged.connect(self.comboScheme_CurrentIndexChanged)
+		self.buttResetSettings.clicked.connect(self.buttResetSettings_Clicked)
+		self.buttResetLogging.clicked.connect(self.buttResetLogging_Clicked)
+		self.buttSaveLogging.clicked.connect(self.buttSaveLogging_Clicked)
 
 		# Initialization of QSystemTrayIcon
 		self.tray_icon = QSystemTrayIcon(self)
@@ -147,6 +150,16 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 				self.current_scheme['mouse_released'] = item['mouse_released']
 				self.current_scheme['other_data'] = item['other_data']
 				break
+
+	def buttResetSettings_Clicked(self):
+		pass
+
+	def buttResetLogging_Clicked(self):
+		pass
+
+	def buttSaveLogging_Clicked(self):
+		with open("log/key.log", "wt") as save:
+			save.write(self.textBrowser.toPlainText())
 
 	def keyboard_Clicked(self, key: str):
 		if self.checkKeyboardClick.isChecked():
