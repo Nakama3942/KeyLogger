@@ -21,7 +21,13 @@ from ui.keylogger import KeyLogger
 
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ui = KeyLogger()
-    ui.show()
-    sys.exit(app.exec())
+    while True:
+        app = QApplication(sys.argv)
+        ui = KeyLogger()
+        ui.show()
+        app.exec()
+        if not ui.REBOOT:
+            break  # If the program did not reset the data, exit the cycle and close the program
+        app = None
+
+    sys.exit()

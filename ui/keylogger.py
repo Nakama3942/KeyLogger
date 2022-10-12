@@ -47,6 +47,11 @@ class ButtonManager(QThread):
 		self._keyboardListener.start()
 		self._mouseListener.start()
 
+	def terminate(self):
+		self._keyboardListener.stop()
+		self._mouseListener.stop()
+		super().terminate()
+
 	def _keyboard_click(self, key):
 		try:
 			self.keyboard_clicked.emit(str(key.name))
@@ -65,6 +70,8 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		super(KeyLogger, self).__init__()
 		self.setupUi(self)
 
+		self.REBOOT: bool = False
+
 		# Data (Color scheme)
 		self.current_scheme = {}
 
@@ -75,6 +82,7 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		self.comboScheme.currentIndexChanged.connect(self.comboScheme_CurrentIndexChanged)
 		self.buttResetSettings.clicked.connect(self.buttResetSettings_Clicked)
 		self.buttResetLogging.clicked.connect(self.buttResetLogging_Clicked)
+		self.buttResetAll.clicked.connect(self.buttResetAll_Clicked)
 		self.buttSaveLogging.clicked.connect(self.buttSaveLogging_Clicked)
 
 		# Initialization of QSystemTrayIcon
@@ -95,6 +103,7 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		self.button_manager.mouse_clicked.connect(self.mouse_Clicked)
 		self.button_manager.mouse_released.connect(self.mouse_Released)
 
+		# Data integrity check
 		if not os.path.exists('data'):
 			self.textBrowser.append(f"<span style='color: #{schemes[0]['other_data']};'>{datetime.datetime.now()} : The program is running for the first time... Configuration initialization:</span>")
 			os.makedirs('data')
@@ -102,19 +111,26 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 			self.textBrowser.append(f"<span style='color: #{schemes[0]['other_data']};'>{datetime.datetime.now()} : Configuration file created.</span>")
 			self.textBrowser.append(f"<span style='color: #{schemes[0]['other_data']};'>{datetime.datetime.now()} : Program log created.</span>")
 		else:
-			self.textBrowser.append(f"<span style='color: #{schemes[0]['other_data']};'>{datetime.datetime.now()} : The program is running...</span>")
-			# Reading settings
-			config = configparser.ConfigParser()
-			config.read("data/config.ini")
-			self.checkKeyboardClick.setChecked(config.getboolean("Settings", "tracking_keyboard_click"))
-			self.checkMouseClick.setChecked(config.getboolean("Settings", "tracking_mouse_click"))
-			self.checkMouseClickCoord.setChecked(config.getboolean("Settings", "tracking_mouse_click_coord"))
-			self.checkMouseRelease.setChecked(config.getboolean("Settings", "tracking_mouse_release"))
-			self.checkMouseReleaseCoord.setChecked(config.getboolean("Settings", "tracking_mouse_release_coord"))
-			self.comboScheme.setCurrentText(config.get("ColorScheme", "current_scheme"))
-			# Reading program log
-			with open("data/KeyLog.save", "rb") as save:
-				self.textBrowser.setHtml(pickle.load(save))
+			try:
+				self.textBrowser.append(f"<span style='color: #{schemes[0]['other_data']};'>{datetime.datetime.now()} : The program is running...</span>")
+				# Reading settings
+				config = configparser.ConfigParser()
+				config.read("data/config.ini")
+				self.checkKeyboardClick.setChecked(config.getboolean("Settings", "tracking_keyboard_click"))
+				self.checkMouseClick.setChecked(config.getboolean("Settings", "tracking_mouse_click"))
+				self.checkMouseClickCoord.setChecked(config.getboolean("Settings", "tracking_mouse_click_coord"))
+				self.checkMouseRelease.setChecked(config.getboolean("Settings", "tracking_mouse_release"))
+				self.checkMouseReleaseCoord.setChecked(config.getboolean("Settings", "tracking_mouse_release_coord"))
+				self.comboScheme.setCurrentText(config.get("ColorScheme", "current_scheme"))
+				# Reading program log
+				with open("data/KeyLog.save", "rb") as save:
+					self.textBrowser.setHtml(pickle.load(save))
+			except configparser.NoSectionError:
+				with open("data/KeyLog.save", "rb") as save:
+					self.textBrowser.setHtml(pickle.load(save))
+				self.saveData()
+			except FileNotFoundError:
+				self.saveData()
 
 		# Checking if some settings can be displayed
 		self.checkMouseClick_Changed()
@@ -152,10 +168,27 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 				break
 
 	def buttResetSettings_Clicked(self):
-		pass
+		self.textBrowser.append(f"<span style='color: #{self.current_scheme['other_data']};'>{datetime.datetime.now()} : Reboot tracking...</span>")
+		self.button_manager.terminate()
+		self.saveData()
+		os.remove("data/config.ini")
+		self.REBOOT = True
+		self.close()
 
 	def buttResetLogging_Clicked(self):
-		pass
+		self.button_manager.terminate()
+		self.saveData()
+		os.remove("data/KeyLog.save")
+		self.REBOOT = True
+		self.close()
+
+	def buttResetAll_Clicked(self):
+		self.button_manager.terminate()
+		os.remove("data/config.ini")
+		os.remove("data/KeyLog.save")
+		os.rmdir("data")
+		self.REBOOT = True
+		self.close()
 
 	def buttSaveLogging_Clicked(self):
 		with open("log/key.log", "wt") as save:
@@ -180,9 +213,11 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 				self.textBrowser.append(f"<span style='color: #{self.current_scheme['mouse_released']};'>{datetime.datetime.now()} : Mouse released with {button}</span>")
 
 	def closeEvent(self, event: QCloseEvent):
-		# Saving
 		self.textBrowser.append(f"<span style='color: #{self.current_scheme['other_data']};'>{datetime.datetime.now()} : Stop tracking...</span>")
-		self.saveData()
+		self.button_manager.terminate()
+		# Saving
+		if not self.REBOOT:
+			self.saveData()
 		# Closing
 		super().closeEvent(event)
 

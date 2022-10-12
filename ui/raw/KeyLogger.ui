@@ -205,6 +205,27 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QPushButton" name="buttResetAll">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>25</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <pointsize>9</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: red</string>
+           </property>
+           <property name="text">
+            <string>Reset All</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
