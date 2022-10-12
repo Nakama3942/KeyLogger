@@ -32,6 +32,10 @@ from PyQt6.QtCore import QThread, pyqtSignal
 from ui.raw.ui_keylogger import Ui_KeyLogger
 from src.color_scheme import schemes
 
+# todo Implement scrolling in ButtonManager with mouse.Listener
+# todo Expand the functionality in the tray
+# todo Improve date-time output
+
 
 class ButtonManager(QThread):
 	keyboard_clicked = pyqtSignal(str)

@@ -32,33 +32,18 @@
         <property name="title">
          <string>Settings</string>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <widget class="QCheckBox" name="checkKeyboardClick">
-           <property name="font">
-            <font>
-             <pointsize>9</pointsize>
-            </font>
-           </property>
-           <property name="text">
-            <string>Clicking keyboard keystrokes</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <layout class="QVBoxLayout" name="verticalLayout">
            <item>
-            <widget class="QCheckBox" name="checkMouseClick">
+            <widget class="QCheckBox" name="checkKeyboardClick">
              <property name="font">
               <font>
                <pointsize>9</pointsize>
               </font>
              </property>
              <property name="text">
-              <string>Clicking mouse keystrokes</string>
+              <string>Clicking keyboard keystrokes</string>
              </property>
              <property name="checked">
               <bool>true</bool>
@@ -66,93 +51,112 @@
             </widget>
            </item>
            <item>
-            <widget class="QCheckBox" name="checkMouseClickCoord">
-             <property name="font">
-              <font>
-               <pointsize>9</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Track coordinates</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
+             <item>
+              <widget class="QCheckBox" name="checkMouseClick">
+               <property name="font">
+                <font>
+                 <pointsize>9</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Clicking mouse keystrokes</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="checkMouseClickCoord">
+               <property name="font">
+                <font>
+                 <pointsize>9</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Track coordinates</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <item>
+              <widget class="QCheckBox" name="checkMouseRelease">
+               <property name="font">
+                <font>
+                 <pointsize>9</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Releasing mouse keystrokes</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="checkMouseReleaseCoord">
+               <property name="font">
+                <font>
+                 <pointsize>9</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Track coordinates</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <item>
-            <widget class="QCheckBox" name="checkMouseRelease">
-             <property name="font">
-              <font>
-               <pointsize>9</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Releasing mouse keystrokes</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkMouseReleaseCoord">
-             <property name="font">
-              <font>
-               <pointsize>9</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>Track coordinates</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QGroupBox" name="groupBox_2">
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="title">
-         <string>Color Scheme</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
-         <item>
-          <widget class="QComboBox" name="comboScheme">
-           <property name="minimumSize">
-            <size>
-             <width>120</width>
-             <height>25</height>
-            </size>
-           </property>
+          <widget class="QGroupBox" name="groupBox_2">
            <property name="font">
             <font>
-             <pointsize>9</pointsize>
+             <pointsize>10</pointsize>
             </font>
            </property>
-           <property name="currentIndex">
-            <number>0</number>
+           <property name="title">
+            <string>Color Scheme</string>
            </property>
-           <item>
-            <property name="text">
-             <string>Standard</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Monochrome</string>
-            </property>
-           </item>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <widget class="QComboBox" name="comboScheme">
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>25</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+               </font>
+              </property>
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
+              <item>
+               <property name="text">
+                <string>Standard</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Monochrome</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
           </widget>
          </item>
         </layout>
@@ -286,7 +290,7 @@
         <widget class="QTextBrowser" name="textBrowser">
          <property name="font">
           <font>
-           <pointsize>12</pointsize>
+           <pointsize>10</pointsize>
           </font>
          </property>
         </widget>
