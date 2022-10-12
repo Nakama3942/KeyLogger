@@ -77,6 +77,9 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
         tray_menu.addAction(show_action)
         self.tray_icon.setContextMenu(tray_menu)
 
+        self.toolTray.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DesktopIcon))
+
+        # Initialization of process of tracking
         self.button_manager = ButtonManager()
         self.button_manager.start()
         self.button_manager.keyboard_clicked.connect(self.keyboard_Clicked)
@@ -92,10 +95,19 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
         self.hide()
 
     def keyboard_Clicked(self, key: str):
-        self.textBrowser.append(f'{datetime.datetime.now()} Key pressed: {key}')
+        if self.checkKeyboardClick.isChecked():
+            self.textBrowser.append(f"<span style='color: #006400;'>{datetime.datetime.now()} Key pressed: {key}</span>")
 
     def mouse_Clicked(self, x: int, y: int, button: str):
-        self.textBrowser.append(f'{datetime.datetime.now()} Mouse clicked at ({x}, {y}) with {button}')
+        if self.checkMouseClick.isChecked():
+            if self.checMouseClickCoord.isChecked():
+                self.textBrowser.append(f"<span style='color: #646200;'>{datetime.datetime.now()} Mouse clicked at ({x}, {y}) with {button}</span>")
+            else:
+                self.textBrowser.append(f"<span style='color: #646200;'>{datetime.datetime.now()} Mouse clicked with {button}</span>")
 
     def mouse_Released(self, x: int, y: int, button: str):
-        self.textBrowser.append(f'{datetime.datetime.now()} Mouse released at ({x}, {y}) with {button}')
+        if self.checkMouseRelease.isChecked():
+            if self.checMouseReleaseCoord.isChecked():
+                self.textBrowser.append(f"<span style='color: #002a64;'>{datetime.datetime.now()} Mouse released at ({x}, {y}) with {button}</span>")
+            else:
+                self.textBrowser.append(f"<span style='color: #002a64;'>{datetime.datetime.now()} Mouse released with {button}</span>")
