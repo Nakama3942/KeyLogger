@@ -25,8 +25,8 @@ from PyQt6.QtWidgets import QApplication,\
 							QSystemTrayIcon,\
 							QStyle,\
 							QMenu
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QAction, QCloseEvent
+from PyQt6.QtCore import Qt, QDir
+from PyQt6.QtGui import QIcon, QAction, QCloseEvent
 from PyQt6.QtCore import QThread, pyqtSignal
 
 from ui.raw.ui_keylogger import Ui_KeyLogger
@@ -73,6 +73,10 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 	def __init__(self):
 		super(KeyLogger, self).__init__()
 		self.setupUi(self)
+
+		# somewhere at the beginning of your program
+		QDir.addSearchPath('icons', 'icons/')
+		self.setWindowIcon(QIcon('icons:KeyLogger_Icon.png'))
 
 		self.REBOOT: bool = False
 
@@ -195,7 +199,7 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		self.close()
 
 	def buttSaveLogging_Clicked(self):
-		with open("log/key.log", "wt") as save:
+		with open("key.log", "wt") as save:
 			save.write(self.textBrowser.toPlainText())
 
 	def keyboard_Clicked(self, key: str):
