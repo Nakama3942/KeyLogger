@@ -34,6 +34,7 @@ from src.calendar import calendar
 
 # todo Expand the set of color schemes and fix the output of information, taking
 #  into account the updated color schemes
+# todo Write more logging text
 
 
 class ButtonManager(QThread):

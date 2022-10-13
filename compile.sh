@@ -1,1 +1,1 @@
-pyinstaller -F -w -i "N:\KeyLogger\icons\KeyLogger.ico" main.pyw
+pyinstaller -F -w -i "N:\KeyLogger\icons\KeyLogger_Icon.ico" main.pyw
