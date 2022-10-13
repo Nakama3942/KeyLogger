@@ -12,7 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import datetime
 import configparser
 import pickle
 import os
@@ -31,10 +30,11 @@ from PyQt6.QtCore import QThread, pyqtSignal
 
 from ui.raw.ui_keylogger import Ui_KeyLogger
 from src.color_scheme import schemes
+from src.calendar import calendar
 
 # todo Implement scrolling in ButtonManager with mouse.Listener
 # todo Expand the functionality in the tray
-# todo Improve date-time output
+# todo Add more color schemes
 
 
 class ButtonManager(QThread):
@@ -64,9 +64,9 @@ class ButtonManager(QThread):
 
 	def _mouse_click(self, x, y, button, pressed):
 		if pressed:
-			self.mouse_clicked.emit(x, y, str(button))
+			self.mouse_clicked.emit(x, y, str(button.name))
 		else:
-			self.mouse_released.emit(x, y, str(button))
+			self.mouse_released.emit(x, y, str(button.name))
 
 
 class KeyLogger(QMainWindow, Ui_KeyLogger):
@@ -74,7 +74,7 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		super(KeyLogger, self).__init__()
 		self.setupUi(self)
 
-		# somewhere at the beginning of your program
+		# Icon initialization
 		QDir.addSearchPath('icons', 'icons/')
 		self.setWindowIcon(QIcon('icons:KeyLogger_Icon.png'))
 
@@ -113,14 +113,14 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 
 		# Data integrity check
 		if not os.path.exists('data'):
-			self.textBrowser.append(f"<span style='color: #{schemes[0]['other_data']};'>{datetime.datetime.now()} : The program is running for the first time... Configuration initialization:</span>")
+			self.textBrowser.append(f"<span style='color: #{schemes[0]['other_data']};'>{calendar()} : The program is running for the first time... Configuration initialization:</span>")
 			os.makedirs('data')
 			self.saveData()
-			self.textBrowser.append(f"<span style='color: #{schemes[0]['other_data']};'>{datetime.datetime.now()} : Configuration file created.</span>")
-			self.textBrowser.append(f"<span style='color: #{schemes[0]['other_data']};'>{datetime.datetime.now()} : Program log created.</span>")
+			self.textBrowser.append(f"<span style='color: #{schemes[0]['other_data']};'>{calendar()} : Configuration file created.</span>")
+			self.textBrowser.append(f"<span style='color: #{schemes[0]['other_data']};'>{calendar()} : Program log created.</span>")
 		else:
 			try:
-				self.textBrowser.append(f"<span style='color: #{schemes[0]['other_data']};'>{datetime.datetime.now()} : The program is running...</span>")
+				self.textBrowser.append(f"<span style='color: #{schemes[0]['other_data']};'>{calendar()} : The program is running...</span>")
 				# Reading settings
 				config = configparser.ConfigParser()
 				config.read("data/config.ini")
@@ -144,7 +144,7 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		self.checkMouseClick_Changed()
 		self.checkMouseRelease_Changed()
 		self.comboScheme_CurrentIndexChanged()
-		self.textBrowser.append(f"<span style='color: #{self.current_scheme['other_data']};'>{datetime.datetime.now()} : Start tracking...</span>")
+		self.textBrowser.append(f"<span style='color: #{self.current_scheme['other_data']};'>{calendar()} : Start tracking...</span>")
 
 	def tray_Show(self):
 		self.tray_icon.hide()
@@ -176,7 +176,7 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 				break
 
 	def buttResetSettings_Clicked(self):
-		self.textBrowser.append(f"<span style='color: #{self.current_scheme['other_data']};'>{datetime.datetime.now()} : Reboot tracking...</span>")
+		self.textBrowser.append(f"<span style='color: #{self.current_scheme['other_data']};'>{calendar()} : Reboot tracking...</span>")
 		self.button_manager.terminate()
 		self.saveData()
 		os.remove("data/config.ini")
@@ -204,24 +204,24 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 
 	def keyboard_Clicked(self, key: str):
 		if self.checkKeyboardClick.isChecked():
-			self.textBrowser.append(f"<span style='color: #{self.current_scheme['key_clicked']};'>{datetime.datetime.now()} : Key pressed: {key}</span>")
+			self.textBrowser.append(f"<span style='color: #{self.current_scheme['key_clicked']};'>{calendar()} : Key pressed: {key}</span>")
 
 	def mouse_Clicked(self, x: int, y: int, button: str):
 		if self.checkMouseClick.isChecked():
 			if self.checkMouseClickCoord.isChecked():
-				self.textBrowser.append(f"<span style='color: #{self.current_scheme['mouse_clicked']};'>{datetime.datetime.now()} : Mouse clicked at ({x}, {y}) with {button}</span>")
+				self.textBrowser.append(f"<span style='color: #{self.current_scheme['mouse_clicked']};'>{calendar()} : Mouse clicked at ({x}, {y}) with {button}</span>")
 			else:
-				self.textBrowser.append(f"<span style='color: #{self.current_scheme['mouse_clicked']};'>{datetime.datetime.now()} : Mouse clicked with {button}</span>")
+				self.textBrowser.append(f"<span style='color: #{self.current_scheme['mouse_clicked']};'>{calendar()} : Mouse clicked with {button}</span>")
 
 	def mouse_Released(self, x: int, y: int, button: str):
 		if self.checkMouseRelease.isChecked():
 			if self.checkMouseReleaseCoord.isChecked():
-				self.textBrowser.append(f"<span style='color: #{self.current_scheme['mouse_released']};'>{datetime.datetime.now()} : Mouse released at ({x}, {y}) with {button}</span>")
+				self.textBrowser.append(f"<span style='color: #{self.current_scheme['mouse_released']};'>{calendar()} : Mouse released at ({x}, {y}) with {button}</span>")
 			else:
-				self.textBrowser.append(f"<span style='color: #{self.current_scheme['mouse_released']};'>{datetime.datetime.now()} : Mouse released with {button}</span>")
+				self.textBrowser.append(f"<span style='color: #{self.current_scheme['mouse_released']};'>{calendar()} : Mouse released with {button}</span>")
 
 	def closeEvent(self, event: QCloseEvent):
-		self.textBrowser.append(f"<span style='color: #{self.current_scheme['other_data']};'>{datetime.datetime.now()} : Stop tracking...</span>")
+		self.textBrowser.append(f"<span style='color: #{self.current_scheme['other_data']};'>{calendar()} : Stop tracking...</span>")
 		self.button_manager.terminate()
 		# Saving
 		if not self.REBOOT:
