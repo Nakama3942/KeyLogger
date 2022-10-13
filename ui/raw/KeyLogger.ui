@@ -154,6 +154,11 @@
                 <string>Monochrome</string>
                </property>
               </item>
+              <item>
+               <property name="text">
+                <string>Sepia</string>
+               </property>
+              </item>
              </widget>
             </item>
            </layout>
