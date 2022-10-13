@@ -33,7 +33,6 @@ from src.color_scheme import schemes
 from src.calendar import calendar
 
 # todo Implement scrolling in ButtonManager with mouse.Listener
-# todo Expand the functionality in the tray
 # todo Add more color schemes
 
 
@@ -95,14 +94,23 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 
 		# Initialization of QSystemTrayIcon
 		self.tray_icon = QSystemTrayIcon(self)
-		self.tray_icon.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon))
+		self.tray_icon.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DesktopIcon))
 		show_action = QAction("Show", self)
+		show_action.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_TitleBarMaxButton))
 		show_action.triggered.connect(self.tray_Show)
+		output_action = QAction("Output to log", self)
+		output_action.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_FileDialogContentsView))
+		output_action.triggered.connect(self.tray_Output)
+		close_action = QAction("Close", self)
+		close_action.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_TitleBarCloseButton))
+		close_action.triggered.connect(self.tray_Close)
 		tray_menu = QMenu()
 		tray_menu.addAction(show_action)
+		tray_menu.addAction(output_action)
+		tray_menu.addAction(close_action)
 		self.tray_icon.setContextMenu(tray_menu)
 
-		self.toolTray.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DesktopIcon))
+		self.toolTray.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon))
 
 		# Initialization of process of tracking
 		self.button_manager = ButtonManager()
@@ -149,6 +157,14 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 	def tray_Show(self):
 		self.tray_icon.hide()
 		self.show()
+
+	def tray_Output(self):
+		self.buttSaveLogging_Clicked()
+		os.startfile("key.log")
+
+	def tray_Close(self):
+		self.tray_Show()
+		self.close()
 
 	def toolTray_Clicked(self):
 		self.tray_icon.show()
