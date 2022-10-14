@@ -30,7 +30,7 @@ from PyQt6.QtCore import QThread, pyqtSignal
 
 from ui.raw.ui_keylogger import Ui_KeyLogger
 from src.color_scheme import schemes
-from src.calendar import calendar
+from src.printer import Printer
 
 
 class ButtonManager(QThread):
@@ -91,6 +91,7 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 
 		# Data (Color scheme)
 		self.current_scheme = {}
+		self.printer = Printer(schemes[0])
 
 		# It's a tracking of button clicks in the window
 		self.toolTray.clicked.connect(self.toolTray_Clicked)
@@ -139,14 +140,14 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 
 		# Data integrity check
 		if not os.path.exists('data'):
-			self.textBrowserLoggingAction.append(f"<span style='color: #{schemes[0]['processing_data']};'>{calendar()} : The program is running for the first time... Configuration initialization:</span>")
+			self.textBrowserLoggingAction.append(self.printer.init_string())
 			os.makedirs('data')
 			self.saveData()
-			self.textBrowserLoggingAction.append(f"<span style='color: #{schemes[0]['processing_data']};'>{calendar()} : Configuration file created.</span>")
-			self.textBrowserLoggingAction.append(f"<span style='color: #{schemes[0]['processing_data']};'>{calendar()} : Program log created.</span>")
+			self.textBrowserLoggingAction.append(self.printer.config_string())
+			self.textBrowserLoggingAction.append(self.printer.log_created_string())
 		else:
 			try:
-				self.textBrowserLoggingAction.append(f"<span style='color: #{schemes[0]['processing_data']};'>{calendar()} : The program is running...</span>")
+				self.textBrowserLoggingAction.append(self.printer.run_string())
 				# Reading settings
 				config = configparser.ConfigParser()
 				config.read("data/config.ini")
@@ -179,12 +180,12 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		self.checkMouseClick_Changed()
 		self.checkMouseRelease_Changed()
 		self.comboScheme_CurrentIndexChanged()
-		self.textBrowserLoggingAction.append(f"<span style='color: #{self.current_scheme['processing_data']};'>{calendar()} : Start tracking...</span>")
+		self.textBrowserLoggingAction.append(self.printer.start_track_string())
 
 	def tray_Show(self):
 		self.tray_icon.hide()
 		self.show()
-		self.textBrowserLoggingAction.append(f"<span style='color: #{self.current_scheme['hide_show']};'>{calendar()} : Program displayed</span>")
+		self.textBrowserLoggingAction.append(self.printer.show_program_string())
 
 	def tray_ActionOutput(self):
 		self.buttSaveLoggingAction_Clicked()
@@ -201,7 +202,7 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 	def toolTray_Clicked(self):
 		self.tray_icon.show()
 		self.hide()
-		self.textBrowserLoggingAction.append(f"<span style='color: #{self.current_scheme['hide_show']};'>{calendar()} : The program is hidden</span>")
+		self.textBrowserLoggingAction.append(self.printer.hide_program_string())
 
 	def checkMouseClick_Changed(self):
 		if self.checkMouseClick.isChecked():
@@ -217,13 +218,14 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 
 	def checkMouseMove_Changed(self):
 		if self.checkMouseMove.isChecked():
-			self.textBrowserLoggingMoving.append(f"<span style='color: #{self.current_scheme['moving_tracking']};'>{calendar()} : Start tracking mouse moving</span>")
+			self.textBrowserLoggingMoving.append(self.printer.start_track_moving_string())
 		else:
-			self.textBrowserLoggingMoving.append(f"<span style='color: #{self.current_scheme['moving_tracking']};'>{calendar()} : Stop tracking mouse moving</span>")
+			self.textBrowserLoggingMoving.append(self.printer.stop_track_moving_string())
 
 	def comboScheme_CurrentIndexChanged(self):
 		for item in schemes:
 			if item['SCHEME_NAME'] == self.comboScheme.currentText():
+				self.current_scheme['SCHEME_NAME'] = item['SCHEME_NAME']
 				self.current_scheme['processing_data'] = item['processing_data']
 				self.current_scheme['hide_show'] = item['hide_show']
 				self.current_scheme['color_scheme_change'] = item['color_scheme_change']
@@ -239,11 +241,13 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 				self.current_scheme['moving_tracking'] = item['moving_tracking']
 				self.current_scheme['mouse_moved'] = item['mouse_moved']
 				self.current_scheme['mouse_moved_coord'] = item['mouse_moved_coord']
-				self.textBrowserLoggingAction.append(f"<span style='color: #{self.current_scheme['color_scheme_change']};'>{calendar()} : Color scheme changed to {item['SCHEME_NAME']}</span>")
+
+				self.printer.reinit(self.current_scheme)
+				self.textBrowserLoggingAction.append(self.printer.change_scheme_string())
 				break
 
 	def buttResetSettings_Clicked(self):
-		self.textBrowserLoggingAction.append(f"<span style='color: #{self.current_scheme['reboot']};'>{calendar()} : Reboot tracking...</span>")
+		self.textBrowserLoggingAction.append(self.printer.reboot_tracking_string())
 		self.button_manager.terminate()
 		self.saveData()
 		os.remove("data/config.ini")
@@ -268,41 +272,41 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 	def buttSaveLoggingAction_Clicked(self):
 		with open("key.log", "wt") as save:
 			save.write(self.textBrowserLoggingAction.toPlainText())
-			self.textBrowserLoggingAction.append(f"<span style='color: #{self.current_scheme['export']};'>{calendar()} : Export logging action</span>")
+			self.textBrowserLoggingAction.append(self.printer.export_action_string())
 
 	def buttSaveLoggingMoving_Clicked(self):
 		with open("mov.log", "wt") as save:
 			save.write(self.textBrowserLoggingMoving.toPlainText())
-			self.textBrowserLoggingAction.append(f"<span style='color: #{self.current_scheme['export']};'>{calendar()} : Export logging moving</span>")
+			self.textBrowserLoggingAction.append(self.printer.export_moving_string())
 
 	def keyboard_Clicked(self, key: str):
 		if self.checkKeyboardClick.isChecked():
-			self.textBrowserLoggingAction.append(f"<span style='color: #{self.current_scheme['key_pressed']};'>{calendar()} : Key pressed: {key}</span>")
+			self.textBrowserLoggingAction.append(self.printer.key_pressed_string(key))
 
 	def mouse_Clicked(self, x: int, y: int, button: str):
 		if self.checkMouseClick.isChecked():
 			if self.checkMouseClickCoord.isChecked():
-				self.textBrowserLoggingAction.append(f"<span style='color: #{self.current_scheme['mouse_clicked']};'>{calendar()} : Mouse clicked at <span style='color: #{self.current_scheme['mouse_clicked_coord']};'>({x}, {y})</span> with {button}</span>")
+				self.textBrowserLoggingAction.append(self.printer.mouse_click_coord_string(x, y, button))
 			else:
-				self.textBrowserLoggingAction.append(f"<span style='color: #{self.current_scheme['mouse_clicked']};'>{calendar()} : Mouse clicked with {button}</span>")
+				self.textBrowserLoggingAction.append(self.printer.mouse_click_string(button))
 
 	def mouse_Released(self, x: int, y: int, button: str):
 		if self.checkMouseRelease.isChecked():
 			if self.checkMouseReleaseCoord.isChecked():
-				self.textBrowserLoggingAction.append(f"<span style='color: #{self.current_scheme['mouse_released']};'>{calendar()} : Mouse released at <span style='color: #{self.current_scheme['mouse_released_coord']};'>({x}, {y})</span> with {button}</span>")
+				self.textBrowserLoggingAction.append(self.printer.mouse_release_coord_string(x, y, button))
 			else:
-				self.textBrowserLoggingAction.append(f"<span style='color: #{self.current_scheme['mouse_released']};'>{calendar()} : Mouse released with {button}</span>")
+				self.textBrowserLoggingAction.append(self.printer.mouse_release_string(button))
 
 	def mouse_Move(self, x: int, y: int):
 		if self.checkMouseMove.isChecked():
-			self.textBrowserLoggingMoving.append(f"<span style='color: #{self.current_scheme['mouse_moved']};'>{calendar()} : Mouse moved to <span style='color: #{self.current_scheme['mouse_moved_coord']};'>({x}, {y})</span></span>")
+			self.textBrowserLoggingMoving.append(self.printer.mouse_move_string(x, y))
 
 	def mouse_Scroll(self, x: int, y: int, dx: int, dy: int):
 		if self.checkMouseScroll.isChecked():
-			self.textBrowserLoggingAction.append(f"<span style='color: #{self.current_scheme['mouse_scrolled']};'>{calendar()} : Mouse scrolled at <span style='color: #{self.current_scheme['mouse_scrolled_coord']};'>({x}, {y})({dx}, {dy})</span></span>")
+			self.textBrowserLoggingAction.append(self.printer.mouse_scroll_string(x, y, dx, dy))
 
 	def closeEvent(self, event: QCloseEvent):
-		self.textBrowserLoggingAction.append(f"<span style='color: #{self.current_scheme['processing_data']};'>{calendar()} : Stop tracking...</span>")
+		self.textBrowserLoggingAction.append(self.printer.stop_track_string())
 		self.button_manager.terminate()
 		# Saving
 		if not self.REBOOT:
