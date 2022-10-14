@@ -83,7 +83,6 @@ class ButtonManager(QThread):
 		:param x: The x coordinate of the mouse cursor
 		:param y: The y coordinate of the mouse cursor, relative to the top-left corner of the screen
 		"""
-		# todo Slow down
 		self.mouse_move.emit(x, y)
 
 	def _mouse_click(self, x, y, button, pressed):
