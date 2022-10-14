@@ -98,7 +98,7 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		self.checkMouseClick.stateChanged.connect(self.checkMouseClick_Changed)
 		self.checkMouseRelease.stateChanged.connect(self.checkMouseRelease_Changed)
 		self.checkMouseMove.stateChanged.connect(self.checkMouseMove_Changed)
-		self.comboScheme.currentIndexChanged.connect(self.comboScheme_CurrentIndexChanged)
+		self.comboScheme.currentTextChanged.connect(self.comboScheme_CurrentIndexChanged)
 		self.buttResetSettings.clicked.connect(self.buttResetSettings_Clicked)
 		self.buttResetLogging.clicked.connect(self.buttResetLogging_Clicked)
 		self.buttResetAll.clicked.connect(self.buttResetAll_Clicked)
@@ -179,7 +179,7 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		# Checking if some settings can be displayed
 		self.checkMouseClick_Changed()
 		self.checkMouseRelease_Changed()
-		self.comboScheme_CurrentIndexChanged()
+		self.comboScheme_CurrentIndexChanged(self.comboScheme.currentText(), False)
 		self.textBrowserLoggingAction.append(self.printer.start_track_string())
 
 	def tray_Show(self):
@@ -222,9 +222,9 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		else:
 			self.textBrowserLoggingMoving.append(self.printer.stop_track_moving_string())
 
-	def comboScheme_CurrentIndexChanged(self):
+	def comboScheme_CurrentIndexChanged(self, new_color_scheme: str, changed: bool = True):
 		for item in schemes:
-			if item['SCHEME_NAME'] == self.comboScheme.currentText():
+			if item['SCHEME_NAME'] == new_color_scheme:
 				self.current_scheme['SCHEME_NAME'] = item['SCHEME_NAME']
 				self.current_scheme['processing_data'] = item['processing_data']
 				self.current_scheme['hide_show'] = item['hide_show']
@@ -243,7 +243,8 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 				self.current_scheme['mouse_moved_coord'] = item['mouse_moved_coord']
 
 				self.printer.reinit(self.current_scheme)
-				self.textBrowserLoggingAction.append(self.printer.change_scheme_string())
+				if changed:
+					self.textBrowserLoggingAction.append(self.printer.change_scheme_string())
 				break
 
 	def buttResetSettings_Clicked(self):
