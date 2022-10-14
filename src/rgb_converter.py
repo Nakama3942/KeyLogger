@@ -1,4 +1,4 @@
-def rgb_to_mono(color: str, gray: bool = True):
+def rgb_to_mono(color: str, gray: bool):
     # Source: https://www.had2know.org/technology/rgb-to-gray-scale-converter.html
     # Algorithm:
     # print(f'RGB:  {color}')
@@ -43,5 +43,5 @@ def rgb_to_sepia(color: str):
 
 # Converting colors
 if __name__ == '__main__':
-    # print(rgb_to_mono('646200', False))
-    print(rgb_to_sepia('503070'))
+    print(rgb_to_mono('544a69', True))
+    print(rgb_to_sepia('544a69'))
