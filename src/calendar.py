@@ -16,6 +16,13 @@ import datetime
 
 
 def calendar(not_ms: bool = True) -> datetime:
+	"""
+	It returns the current date and time.
+
+	:param not_ms: If True, the microseconds will be set to 0, defaults to True
+	:type not_ms: bool (optional)
+	:return: A datetime object with the current date and time.
+	"""
 	if not_ms:
 		return datetime.datetime.today().replace(microsecond=0)
 	return datetime.datetime.today()

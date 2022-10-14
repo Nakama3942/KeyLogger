@@ -15,6 +15,7 @@
 from src.calendar import calendar
 
 
+# The class contains functions that form and return a string for output to the user
 class Printer:
 	current_scheme: dict = {}
 

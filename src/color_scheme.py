@@ -12,6 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+# Defining color schemes
 schemes = [
     {
         'SCHEME_NAME': 'Standard',

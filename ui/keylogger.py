@@ -33,6 +33,7 @@ from src.color_scheme import schemes
 from src.printer import Printer
 
 
+# This class is a QThread that responds to user interaction with keyboard keys and the mouse
 class ButtonManager(QThread):
 	keyboard_clicked = pyqtSignal(str)
 	mouse_clicked = pyqtSignal(int, int, str)
@@ -41,35 +42,74 @@ class ButtonManager(QThread):
 	mouse_scroll = pyqtSignal(int, int, int, int)
 
 	def __init__(self):
+		"""
+		The function __init__() is a constructor for the class ButtonManager. It calls the constructor of the superclass (the
+		class it inherits from) and then creates two listeners, one for the keyboard and one for the mouse
+		"""
 		super(ButtonManager, self).__init__()
 		self._keyboardListener = keyboard.Listener(on_press=self._keyboard_click)
 		self._mouseListener = mouse.Listener(on_move=self._mouse_move, on_click=self._mouse_click, on_scroll=self._mouse_scroll)
 
 	def run(self):
+		"""
+		The function starts the keyboard and mouse listeners
+		"""
 		self._keyboardListener.start()
 		self._mouseListener.start()
 
 	def terminate(self):
+		"""
+		It stops the keyboard and mouse listeners, and then calls the terminate function of the super class
+		"""
 		self._keyboardListener.stop()
 		self._mouseListener.stop()
 		super().terminate()
 
 	def _keyboard_click(self, key):
+		"""
+		It emits a signal that is connected to a slot in the main window
+
+		:param key: The key that was pressed
+		"""
 		try:
 			self.keyboard_clicked.emit(str(key.name))
 		except AttributeError:
 			self.keyboard_clicked.emit(str(key))
 
 	def _mouse_move(self, x, y):
+		"""
+		It emits a signal that tells the main thread to move the mouse
+
+		:param x: The x coordinate of the mouse cursor
+		:param y: The y coordinate of the mouse cursor, relative to the top-left corner of the screen
+		"""
+		# todo Slow down
 		self.mouse_move.emit(x, y)
 
 	def _mouse_click(self, x, y, button, pressed):
+		"""
+		If the mouse button is pressed, emit a signal with the x and y coordinates of the mouse and the name of the button
+
+		:param x: The x coordinate of the mouse click
+		:param y: The y coordinate of the mouse event
+		:param button: The mouse button that was clicked
+		:param pressed: True if the button was pressed, False if it was released
+		"""
 		if pressed:
 			self.mouse_clicked.emit(x, y, str(button.name))
 		else:
 			self.mouse_released.emit(x, y, str(button.name))
 
 	def _mouse_scroll(self, x, y, dx, dy):
+		"""
+		It emits a signal when the mouse is scrolled
+
+		:param x: The x position of the mouse cursor
+		:param y: The y-coordinate of the mouse cursor, relative to the window
+		:param dx: The amount scrolled horizontally, expressed in integer units
+		:param dy: The amount of scrolling that was done. Positive values indicate that the mouse wheel was rotated forward,
+		away from the user; negative values indicate that the mouse wheel was rotated backward, toward the user
+		"""
 		self.mouse_scroll.emit(x, y, dx, dy)
 
 
@@ -87,9 +127,10 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		qr.moveCenter(self.screen().availableGeometry().center())
 		self.move(qr.topLeft())
 
+		# Reboot flag
 		self.REBOOT: bool = False
 
-		# Data (Color scheme)
+		# Data (Color scheme and strings)
 		self.current_scheme = {}
 		self.printer = Printer(schemes[0])
 
@@ -106,6 +147,7 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		self.buttSaveLoggingMoving.clicked.connect(self.buttSaveLoggingMoving_Clicked)
 
 		# Initialization of QSystemTrayIcon
+		self.toolTray.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon))
 		self.tray_icon = QSystemTrayIcon(self)
 		self.tray_icon.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DesktopIcon))
 		show_action = QAction("Show", self)
@@ -126,8 +168,6 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		tray_menu.addAction(output_moving)
 		tray_menu.addAction(close_action)
 		self.tray_icon.setContextMenu(tray_menu)
-
-		self.toolTray.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon))
 
 		# Initialization of process of tracking
 		self.button_manager = ButtonManager()
@@ -183,46 +223,81 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		self.textBrowserLoggingAction.append(self.printer.start_track_string())
 
 	def tray_Show(self):
+		"""
+		The function hides the tray icon, shows the main window, and prints a message to the text browser
+		"""
 		self.tray_icon.hide()
 		self.show()
 		self.textBrowserLoggingAction.append(self.printer.show_program_string())
 
 	def tray_ActionOutput(self):
+		"""
+		It saves actions the log file, then opens it
+		"""
 		self.buttSaveLoggingAction_Clicked()
 		os.startfile("key.log")
 
 	def tray_MovingOutput(self):
+		"""
+		It saves moving the log file, then opens it
+		"""
 		self.buttSaveLoggingMoving_Clicked()
 		os.startfile("mov.log")
 
 	def tray_Close(self):
+		"""
+		It closes the program
+		"""
 		self.tray_Show()
 		self.close()
 
 	def toolTray_Clicked(self):
+		"""
+		The function hides the program and shows the tray icon
+		"""
 		self.tray_icon.show()
 		self.hide()
 		self.textBrowserLoggingAction.append(self.printer.hide_program_string())
 
 	def checkMouseClick_Changed(self):
+		"""
+		If the checkbox is checked, enable the other checkbox. If it's not checked, disable the other checkbox
+		"""
 		if self.checkMouseClick.isChecked():
 			self.checkMouseClickCoord.setEnabled(True)
 		else:
 			self.checkMouseClickCoord.setEnabled(False)
 
 	def checkMouseRelease_Changed(self):
+		"""
+		If the checkbox is checked, enable the other checkbox. If it's not checked, disable the other checkbox
+		"""
 		if self.checkMouseRelease.isChecked():
 			self.checkMouseReleaseCoord.setEnabled(True)
 		else:
 			self.checkMouseReleaseCoord.setEnabled(False)
 
 	def checkMouseMove_Changed(self):
+		"""
+		If the checkbox is checked, then start tracking mouse movement. If the checkbox is unchecked, then stop tracking mouse
+		movement
+		"""
 		if self.checkMouseMove.isChecked():
 			self.textBrowserLoggingMoving.append(self.printer.start_track_moving_string())
 		else:
 			self.textBrowserLoggingMoving.append(self.printer.stop_track_moving_string())
 
 	def comboScheme_CurrentIndexChanged(self, new_color_scheme: str, changed: bool = True):
+		"""
+		It takes a string as an argument, and then it loops through a list of dictionaries, and if the string matches the value
+		of the key 'SCHEME_NAME' in the dictionary, it sets the value of the key 'SCHEME_NAME' in the dictionary
+		'current_scheme' to the value of the key 'SCHEME_NAME' in the dictionary that was found in the list of dictionaries
+
+		:param new_color_scheme: The name of the color scheme that was selected
+		:type new_color_scheme: str
+		:param changed: bool = True, defaults to True
+		:type changed: bool (optional)
+		"""
 		for item in schemes:
 			if item['SCHEME_NAME'] == new_color_scheme:
 				self.current_scheme['SCHEME_NAME'] = item['SCHEME_NAME']
@@ -248,6 +323,9 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 				break
 
 	def buttResetSettings_Clicked(self):
+		"""
+		It resets the settings to default and reboots the program
+		"""
 		self.textBrowserLoggingAction.append(self.printer.reboot_tracking_string())
 		self.button_manager.terminate()
 		self.saveData()
@@ -256,6 +334,9 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		self.close()
 
 	def buttResetLogging_Clicked(self):
+		"""
+		It resets the logging and reboots the program
+		"""
 		self.button_manager.terminate()
 		self.saveData()
 		os.remove("data/KeyLog.save")
@@ -263,6 +344,9 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		self.close()
 
 	def buttResetAll_Clicked(self):
+		"""
+		It deletes the config file, the keylogger file, and the data directory
+		"""
 		self.button_manager.terminate()
 		os.remove("data/config.ini")
 		os.remove("data/KeyLog.save")
@@ -271,20 +355,43 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		self.close()
 
 	def buttSaveLoggingAction_Clicked(self):
+		"""
+		It opens a file called key.log and writes the contents of the textBrowserLoggingAction widget to it
+		"""
 		with open("key.log", "wt") as save:
 			save.write(self.textBrowserLoggingAction.toPlainText())
 			self.textBrowserLoggingAction.append(self.printer.export_action_string())
 
 	def buttSaveLoggingMoving_Clicked(self):
+		"""
+		It opens a file called mov.log and writes the contents of the textBrowserLoggingMoving widget to it
+		"""
 		with open("mov.log", "wt") as save:
 			save.write(self.textBrowserLoggingMoving.toPlainText())
 			self.textBrowserLoggingAction.append(self.printer.export_moving_string())
 
 	def keyboard_Clicked(self, key: str):
+		"""
+		Sends the pressed keyboard key to the printer
+
+		:param key: keyboard keystroke
+		:type key: str
+		"""
 		if self.checkKeyboardClick.isChecked():
 			self.textBrowserLoggingAction.append(self.printer.key_pressed_string(key))
 
 	def mouse_Clicked(self, x: int, y: int, button: str):
+		"""
+		If the checkbox is checked, then if the other checkbox is checked, then print the mouse click with coordinates,
+		otherwise print the mouse click without coordinates
+
+		:param x: the x coordinate of the mouse click
+		:type x: int
+		:param y: the y coordinate of the mouse click
+		:type y: int
+		:param button: mouse keystroke
+		:type button: str
+		"""
 		if self.checkMouseClick.isChecked():
 			if self.checkMouseClickCoord.isChecked():
 				self.textBrowserLoggingAction.append(self.printer.mouse_click_coord_string(x, y, button))
@@ -292,6 +399,17 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 				self.textBrowserLoggingAction.append(self.printer.mouse_click_string(button))
 
 	def mouse_Released(self, x: int, y: int, button: str):
+		"""
+		The function checks if the checkbox is checked, and if it is, it checks if the checkbox for coordinates is checked, and
+		if it is, it prints the coordinates, otherwise it prints the button
+
+		:param x: the x coordinate of the mouse
+		:type x: int
+		:param y: the y coordinate of the mouse
+		:type y: int
+		:param button: mouse keystroke
+		:type button: str
+		"""
 		if self.checkMouseRelease.isChecked():
 			if self.checkMouseReleaseCoord.isChecked():
 				self.textBrowserLoggingAction.append(self.printer.mouse_release_coord_string(x, y, button))
@@ -299,14 +417,42 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 				self.textBrowserLoggingAction.append(self.printer.mouse_release_string(button))
 
 	def mouse_Move(self, x: int, y: int):
+		"""
+		If the checkbox is checked, then append the mouse move string to the text browser
+
+		:param x: the x coordinate of the mouse
+		:type x: int
+		:param y: the y coordinate of the mouse
+		:type y: int
+		"""
 		if self.checkMouseMove.isChecked():
 			self.textBrowserLoggingMoving.append(self.printer.mouse_move_string(x, y))
 
 	def mouse_Scroll(self, x: int, y: int, dx: int, dy: int):
+		"""
+		It prints the mouse scroll action to the textBrowserLoggingAction
+
+		:param x: the x position of the mouse cursor
+		:type x: int
+		:param y: the x position of the mouse cursor
+		:type y: int
+		:param dx: the amount scrolled horizontally, expressed in multiples of the WHEEL_DELTA constant. A positive value
+		indicates that the wheel was rotated to the right
+		:type dx: int
+		:param dy: the vertical scroll amount. Positive values indicate that the mouse wheel was rotated forward, away from the
+		user; negative values indicate that the mouse wheel was rotated backward, toward the user
+		:type dy: int
+		"""
 		if self.checkMouseScroll.isChecked():
 			self.textBrowserLoggingAction.append(self.printer.mouse_scroll_string(x, y, dx, dy))
 
 	def closeEvent(self, event: QCloseEvent):
+		"""
+		The function is called when the user closes the GUI. It stops the printer, saves the data, and closes the GUI
+
+		:param event: close event
+		:type event: QCloseEvent
+		"""
 		self.textBrowserLoggingAction.append(self.printer.stop_track_string())
 		self.button_manager.terminate()
 		# Saving
@@ -316,6 +462,9 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 		super().closeEvent(event)
 
 	def saveData(self):
+		"""
+		The function saves the data from the GUI to a file, so you don't have to type it in every time
+		"""
 		# Saving data to a file, so you don't have to type it in every time
 		config = configparser.ConfigParser()
 		config.add_section('Settings')

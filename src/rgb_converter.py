@@ -13,6 +13,15 @@
 #  limitations under the License.
 
 def rgb_to_mono(color: str, gray: bool):
+    """
+    It converts a color to a monochrome color.
+
+    :param color: The color to convert to monochrome
+    :type color: str
+    :param gray: If True, the image will be converted to grayscale. If False, the image will be converted to monochrome
+    :type gray: bool
+    :return: A string of the hex value of the color.
+    """
     # Source: https://www.had2know.org/technology/rgb-to-gray-scale-converter.html
     # Algorithm:
     # print(f'RGB:  {color}')
@@ -41,6 +50,13 @@ def rgb_to_mono(color: str, gray: bool):
 
 
 def rgb_to_sepia(color: str):
+    """
+    It takes a hex color string, applies the sepia filter, and returns the new hex color string
+
+    :param color: The color to convert to sepia
+    :type color: str
+    :return: A string of 6 hexadecimal characters.
+    """
     # print(f'RGB:  {color}')
     red = color[0:2]
     green = color[2:4]
