@@ -223,7 +223,7 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 
 	def comboScheme_CurrentIndexChanged(self):
 		for item in schemes:
-			if item['GUI'] == self.comboScheme.currentText():
+			if item['SCHEME_NAME'] == self.comboScheme.currentText():
 				self.current_scheme['processing_data'] = item['processing_data']
 				self.current_scheme['hide_show'] = item['hide_show']
 				self.current_scheme['color_scheme_change'] = item['color_scheme_change']
@@ -239,7 +239,7 @@ class KeyLogger(QMainWindow, Ui_KeyLogger):
 				self.current_scheme['moving_tracking'] = item['moving_tracking']
 				self.current_scheme['mouse_moved'] = item['mouse_moved']
 				self.current_scheme['mouse_moved_coord'] = item['mouse_moved_coord']
-				self.textBrowserLoggingAction.append(f"<span style='color: #{self.current_scheme['color_scheme_change']};'>{calendar()} : Color scheme changed to {item['GUI']}</span>")
+				self.textBrowserLoggingAction.append(f"<span style='color: #{self.current_scheme['color_scheme_change']};'>{calendar()} : Color scheme changed to {item['SCHEME_NAME']}</span>")
 				break
 
 	def buttResetSettings_Clicked(self):

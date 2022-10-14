@@ -1,6 +1,6 @@
 schemes = [
     {
-        'GUI': 'Standard',
+        'SCHEME_NAME': 'Standard',
         'processing_data': '503070',
         'hide_show': '3e1770',
         'color_scheme_change': '544a69',
@@ -17,7 +17,24 @@ schemes = [
         'mouse_moved': '607040',
         'mouse_moved_coord': '36471d'
     }, {
-        'GUI': 'Monochrome',
+        'SCHEME_NAME': 'Monochrome -dim-',
+        'processing_data': '181c0d',
+        'hide_show': '130e0d',
+        'color_scheme_change': '192b0c',
+        'reboot': '10180d',
+        'export': '144100',
+        'key_pressed': '002e00',
+        'mouse_clicked': '1e3a00',
+        'mouse_clicked_coord': '152900',
+        'mouse_released': '212b00',
+        'mouse_released_coord': '151400',
+        'mouse_scrolled': '00190b',
+        'mouse_scrolled_coord': '001308',
+        'moving_tracking': '193105',
+        'mouse_moved': '1d4207',
+        'mouse_moved_coord': '102a03'
+    }, {
+        'SCHEME_NAME': 'Monochrome -gray-',
         'processing_data': '414141',
         'hide_show': '2d2d2d',
         'color_scheme_change': '515151',
@@ -34,7 +51,7 @@ schemes = [
         'mouse_moved': '666666',
         'mouse_moved_coord': '3d3d3d'
     }, {
-        'GUI': 'Sepia',
+        'SCHEME_NAME': 'Sepia',
         'processing_data': '5a503e',
         'hide_show': '3f382c',
         'color_scheme_change': '6e624c',

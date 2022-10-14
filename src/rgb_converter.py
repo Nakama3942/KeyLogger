@@ -42,6 +42,9 @@ def rgb_to_sepia(color: str):
 
 
 # Converting colors
-if __name__ == '__main__':
-    print(rgb_to_mono('544a69', True))
-    print(rgb_to_sepia('544a69'))
+# if __name__ == '__main__':
+#     color = '36471d'
+#     print(color)
+#     print(rgb_to_mono(color, False))
+#     print(rgb_to_mono(color, True))
+#     print(rgb_to_sepia(color))

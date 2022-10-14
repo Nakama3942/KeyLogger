@@ -204,7 +204,12 @@
               </item>
               <item>
                <property name="text">
-                <string>Monochrome</string>
+                <string>Monochrome -dim-</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Monochrome -gray-</string>
                </property>
               </item>
               <item>
